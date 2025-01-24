@@ -5,21 +5,18 @@ export type TypePagination = {
   itemPerPage: number;
 };
 
-export type TypeResponseGetUserList = {
-  id: string;
+export type TypeResponseGetBookList = {
   category: {
     id: string;
     name: string;
   };
+  id: string;
   title: string;
   author: string;
   isbn: string;
   quantity: number;
   createdBy: {
-    role: string;
     id: string;
     name: string;
-    email: string;
-    password: string;
   };
 }[];

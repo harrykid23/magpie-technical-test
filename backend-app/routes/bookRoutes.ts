@@ -1,14 +1,14 @@
 import { composeMiddlewareList, type TypeAPIBody } from "../utils/apiUtils.ts";
 import dbMiddleware from "../middlewares/dbMiddleware.ts";
 import type { FastifyInstance } from "fastify";
-import type { TypeResponseGetUserList } from "../../shared/types.ts";
+import type { TypeResponseGetBookList } from "../../shared/types.ts";
 
 export default async function (fastify: FastifyInstance) {
   // Get all users
   fastify.get(
     "/",
     composeMiddlewareList(dbMiddleware)(async (request, reply) => {
-      const users: TypeResponseGetUserList = await request.trx.book.findMany({
+      const books: TypeResponseGetBookList = await request.trx.book.findMany({
         select: {
           id: true,
           title: true,
@@ -16,12 +16,18 @@ export default async function (fastify: FastifyInstance) {
           isbn: true,
           quantity: true,
           category: true,
-          createdBy: true,
+          createdBy: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
         },
+        take: 5,
       });
-      const res: TypeAPIBody<TypeResponseGetUserList> = {
+      const res: TypeAPIBody<TypeResponseGetBookList> = {
         statusCode: 200,
-        data: users,
+        data: books,
       };
 
       reply.send(res);

@@ -14,27 +14,30 @@ datasource db {
 }
 
 model User {
-  id       String    @id @default(uuid())
-  email    String    @unique
-  password String
-  name     String
-  role     String
-  members  Member[]
-  books    Book[]
-  Lending  Lending[]
+  id              String    @id @default(uuid())
+  email           String    @unique
+  password        String
+  name            String
+  roleId          String
+  role            Role      @relation(fields: [roleId], references: [id])
+  booksCreated    Book[]    @relation("BookCreatedByRelation")
+  booksDeleted    Book[]    @relation("BookDeletedByRelation")
+  lendingsCreated Lending[] @relation("LendingCreatedByRelation")
+  lendingsDeleted Lending[] @relation("LendingDeletedByRelation")
 }
 
 model Role {
-  id                String              @id @default(uuid())
-  name              String              @unique
-  MapRolePermission MapRolePermission[]
+  id                 String              @id @default(uuid())
+  name               String              @unique
+  mapRolePermissions MapRolePermission[]
+  user               User[]
 }
 
 model Permission {
-  id                String              @id @default(uuid())
-  name              String              @unique
-  description       String
-  MapRolePermission MapRolePermission[]
+  id                 String              @id @default(uuid())
+  name               String              @unique
+  description        String
+  mapRolePermissions MapRolePermission[]
 }
 
 model MapRolePermission {
@@ -46,15 +49,12 @@ model MapRolePermission {
 }
 
 model Member {
-  id         String    @id @default(uuid())
-  userId     String
-  name       String
-  email      String
-  phone      String?
-  status     String
-  joinedDate DateTime
-  user       User      @relation(fields: [userId], references: [id])
-  lendings   Lending[]
+  id        String    @id @default(uuid())
+  name      String
+  email     String
+  phone     String?
+  createdAt DateTime  @default(now())
+  lendings  Lending[]
 }
 
 model Book {
@@ -65,8 +65,12 @@ model Book {
   quantity    Int
   categoryId  String
   category    Category  @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime  @default(now())
   createdById String
-  createdBy   User      @relation(fields: [createdById], references: [id])
+  createdBy   User      @relation("BookCreatedByRelation", fields: [createdById], references: [id])
+  deletedAt   DateTime?
+  deletedById String?
+  deletedBy   User?     @relation("BookDeletedByRelation", fields: [deletedById], references: [id])
   lendings    Lending[]
 }
 
@@ -77,15 +81,17 @@ model Category {
 }
 
 model Lending {
-  id           String    @id @default(uuid())
-  bookId       String
-  book         Book      @relation(fields: [bookId], references: [id])
-  memberId     String
-  member       Member    @relation(fields: [memberId], references: [id])
-  borrowedDate DateTime
-  dueDate      DateTime
-  returnDate   DateTime?
-  status       String
-  createdById  String
-  createdBy    User      @relation(fields: [createdById], references: [id])
+  id          String    @id @default(uuid())
+  bookId      String
+  book        Book      @relation(fields: [bookId], references: [id])
+  memberId    String
+  member      Member    @relation(fields: [memberId], references: [id])
+  dueDate     DateTime
+  returnDate  DateTime?
+  createdAt   DateTime  @default(now())
+  createdById String
+  createdBy   User      @relation("LendingCreatedByRelation", fields: [createdById], references: [id])
+  deletedAt   DateTime?
+  deletedById String?
+  deletedBy   User?     @relation("LendingDeletedByRelation", fields: [deletedById], references: [id])
 }

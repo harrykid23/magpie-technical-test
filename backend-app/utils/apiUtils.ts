@@ -1,5 +1,7 @@
 import type { RouteHandlerMethod } from "fastify";
 import type { TypePagination } from "../../shared/types.ts";
+import type { Prisma, PrismaClient } from "@prisma/client";
+import type { DefaultArgs } from "@prisma/client/runtime/library";
 
 type TypeAPIBody<T = any> = {
   statusCode: number;
@@ -35,6 +37,11 @@ const composeMiddlewareList: TypeMiddlewareComposer = function (
   };
 };
 
+type TypeTransaction = Omit<
+  PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
+  "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
+>;
+
 export default null;
 export { APIError, composeMiddlewareList };
-export type { TypeAPIBody, TypeMiddleware };
+export type { TypeAPIBody, TypeMiddleware, TypeTransaction };
