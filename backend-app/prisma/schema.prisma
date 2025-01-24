@@ -1,0 +1,91 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String    @id @default(uuid())
+  email    String    @unique
+  password String
+  name     String
+  role     String
+  members  Member[]
+  books    Book[]
+  Lending  Lending[]
+}
+
+model Role {
+  id                String              @id @default(uuid())
+  name              String              @unique
+  MapRolePermission MapRolePermission[]
+}
+
+model Permission {
+  id                String              @id @default(uuid())
+  name              String              @unique
+  description       String
+  MapRolePermission MapRolePermission[]
+}
+
+model MapRolePermission {
+  id           String     @id @default(uuid())
+  roleId       String
+  role         Role       @relation(fields: [roleId], references: [id])
+  permissionId String
+  permission   Permission @relation(fields: [permissionId], references: [id])
+}
+
+model Member {
+  id         String    @id @default(uuid())
+  userId     String
+  name       String
+  email      String
+  phone      String?
+  status     String
+  joinedDate DateTime
+  user       User      @relation(fields: [userId], references: [id])
+  lendings   Lending[]
+}
+
+model Book {
+  id          String    @id @default(uuid())
+  title       String
+  author      String
+  isbn        String
+  quantity    Int
+  categoryId  String
+  category    Category  @relation(fields: [categoryId], references: [id])
+  createdById String
+  createdBy   User      @relation(fields: [createdById], references: [id])
+  lendings    Lending[]
+}
+
+model Category {
+  id    String @id @default(uuid())
+  name  String
+  books Book[]
+}
+
+model Lending {
+  id           String    @id @default(uuid())
+  bookId       String
+  book         Book      @relation(fields: [bookId], references: [id])
+  memberId     String
+  member       Member    @relation(fields: [memberId], references: [id])
+  borrowedDate DateTime
+  dueDate      DateTime
+  returnDate   DateTime?
+  status       String
+  createdById  String
+  createdBy    User      @relation(fields: [createdById], references: [id])
+}
