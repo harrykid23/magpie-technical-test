@@ -3,6 +3,7 @@ import { APIError, type TypeTransaction } from "./apiUtils.ts";
 import type { FastifyReply } from "fastify";
 import { COOKIE_NAME_ACCESS_TOKEN } from "../../shared/constants.ts";
 import type { TypeSession } from "../../shared/types.ts";
+import { generateJWT } from "./jwtUtils.ts";
 
 // Encrypts a plain password using bcrypt.
 export async function encryptPassword(plainPassword: string) {
@@ -18,6 +19,15 @@ export async function checkPassword(
 ) {
   return bcrypt.compare(plainPassword, hashedPassword);
 }
+
+export const generateAccessTokenFromSessionData = (
+  sessionData: TypeSession
+) => {
+  const accessTokenLifetime = 1 * 24 * 3600; // 1 day
+  const accessToken = generateJWT(sessionData, accessTokenLifetime);
+
+  return { accessTokenLifetime, accessToken };
+};
 
 export const getSessionData = async (trx: TypeTransaction, userId: string) => {
   const session = (await trx.user.findFirst({

@@ -10,9 +10,13 @@ import type {
   TypeResponseLogin,
   TypeSession,
 } from "../../shared/types.ts";
-import { checkPassword, getSessionData } from "../utils/authUtils.ts";
+import {
+  checkPassword,
+  generateAccessTokenFromSessionData,
+  getSessionData,
+} from "../utils/authUtils.ts";
 import { COOKIE_NAME_ACCESS_TOKEN } from "../../shared/constants.ts";
-import { generateJWT } from "../utils/jwtUtils.ts";
+import authMiddleware from "../middlewares/authMiddleware.ts";
 
 export default async function (fastify: FastifyInstance) {
   // Login
@@ -59,8 +63,8 @@ export default async function (fastify: FastifyInstance) {
         request.trx,
         user.id
       );
-      const accessTokenLifetime = 30 * 24 * 3600; // 30 days
-      const accessToken = generateJWT(sessionData, accessTokenLifetime);
+      const { accessTokenLifetime, accessToken } =
+        generateAccessTokenFromSessionData(sessionData);
 
       reply.setCookie(COOKIE_NAME_ACCESS_TOKEN, accessToken, {
         httpOnly: true,
@@ -69,6 +73,32 @@ export default async function (fastify: FastifyInstance) {
       });
 
       const res: TypeAPIBody<TypeResponseLogin> = {
+        statusCode: 200,
+        data: sessionData,
+      };
+
+      return res;
+    })
+  );
+
+  fastify.get(
+    "/getSessionData",
+    composeMiddlewareList(
+      dbMiddleware,
+      authMiddleware
+    )(async (request, reply) => {
+      // update token
+      const sessionData: TypeSession = request.session;
+      const { accessTokenLifetime, accessToken } =
+        generateAccessTokenFromSessionData(sessionData);
+
+      reply.setCookie(COOKIE_NAME_ACCESS_TOKEN, accessToken, {
+        httpOnly: true,
+        path: "/",
+        maxAge: accessTokenLifetime,
+      });
+
+      const res: TypeAPIBody<TypeSession> = {
         statusCode: 200,
         data: sessionData,
       };
