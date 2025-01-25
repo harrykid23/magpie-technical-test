@@ -11,3 +11,5 @@ export const PERMISSION_NAME = {
   update_lending: "UPDATE_LENDING",
   delete_lending: "DELETE_LENDING",
 };
+
+export const PAGINATION_MAX_ITEM_PER_PAGE = 100;

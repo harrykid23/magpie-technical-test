@@ -1,13 +1,60 @@
-import { composeMiddlewareList, type TypeAPIBody } from "../utils/apiUtils.ts";
+import {
+  composeMiddlewareList,
+  getPaginationData,
+  type TypeAPIBody,
+} from "../utils/apiUtils.ts";
 import dbMiddleware from "../middlewares/dbMiddleware.ts";
 import type { FastifyInstance } from "fastify";
-import type { TypeResponseGetBookList } from "../../shared/types.ts";
+import type {
+  TypeRequestCreateBook,
+  TypeRequestGetTable,
+  TypeResponseCreateBook,
+  TypeResponseGetBookList,
+} from "../../shared/types.ts";
+import type { Prisma } from "@prisma/client";
 
 export default async function (fastify: FastifyInstance) {
-  // Get all users
-  fastify.get(
+  // Get all books
+  fastify.post(
     "/",
     composeMiddlewareList(dbMiddleware)(async (request, reply) => {
+      const bodyRequest = request.body as TypeRequestGetTable;
+      const { currentPage, itemPerPage } = getPaginationData(bodyRequest);
+
+      const whereClause: Prisma.BookWhereInput = {
+        OR: [
+          {
+            title: {
+              contains: bodyRequest.option?.search,
+              mode: "insensitive",
+            },
+          },
+          {
+            author: {
+              contains: bodyRequest.option?.search,
+              mode: "insensitive",
+            },
+          },
+          {
+            isbn: {
+              contains: bodyRequest.option?.search,
+              mode: "insensitive",
+            },
+          },
+          {
+            category: {
+              name: {
+                contains: bodyRequest.option?.search,
+                mode: "insensitive",
+              },
+            },
+          },
+        ],
+        deletedAt: {
+          equals: null,
+        },
+      };
+
       const books: TypeResponseGetBookList = await request.trx.book.findMany({
         select: {
           id: true,
@@ -18,19 +65,70 @@ export default async function (fastify: FastifyInstance) {
           category: true,
           createdBy: {
             select: {
-              id: true,
               name: true,
             },
           },
         },
-        take: 5,
+        where: whereClause,
+        skip: itemPerPage * (currentPage - 1),
+        take: itemPerPage,
+        orderBy: bodyRequest.option?.orderBy,
       });
+
+      const totalCount = await request.trx.book.count({
+        where: whereClause,
+      });
+
       const res: TypeAPIBody<TypeResponseGetBookList> = {
         statusCode: 200,
         data: books,
+        pagination: {
+          currentPage,
+          itemPerPage,
+          maxPage: Math.ceil(totalCount / itemPerPage),
+        },
       };
 
-      reply.send(res);
+      return res;
+    })
+  );
+
+  // Create book
+  fastify.post(
+    "/create",
+    composeMiddlewareList(dbMiddleware)(async (request, reply) => {
+      const bodyRequest = request.body as TypeRequestCreateBook;
+
+      const book: TypeResponseCreateBook = await request.trx.book.create({
+        select: {
+          id: true,
+          title: true,
+          author: true,
+          isbn: true,
+          quantity: true,
+          category: true,
+          createdBy: {
+            select: {
+              name: true,
+            },
+          },
+        },
+        data: {
+          title: bodyRequest.title,
+          author: bodyRequest.author,
+          isbn: bodyRequest.isbn,
+          quantity: bodyRequest.quantity,
+          categoryId: bodyRequest.categoryId,
+          createdById: request.session.id,
+        },
+      });
+
+      const res: TypeAPIBody<TypeResponseCreateBook> = {
+        statusCode: 200,
+        data: book,
+      };
+
+      return res;
     })
   );
 }

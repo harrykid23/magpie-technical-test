@@ -1,7 +1,11 @@
 import type { RouteHandlerMethod } from "fastify";
-import type { TypePagination } from "../../shared/types.ts";
+import type {
+  TypePagination,
+  TypeRequestGetTable,
+} from "../../shared/types.ts";
 import type { Prisma, PrismaClient } from "@prisma/client";
 import type { DefaultArgs } from "@prisma/client/runtime/library";
+import { PAGINATION_MAX_ITEM_PER_PAGE } from "../../shared/constants.ts";
 
 type TypeAPIBody<T = any> = {
   statusCode: number;
@@ -42,6 +46,16 @@ type TypeTransaction = Omit<
   "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
 >;
 
+const getPaginationData = (data: TypeRequestGetTable) => {
+  const currentPage = Math.max(data.currentPage, 1);
+  const itemPerPage = Math.min(data.itemPerPage, PAGINATION_MAX_ITEM_PER_PAGE);
+
+  return {
+    currentPage,
+    itemPerPage,
+  };
+};
+
 export default null;
-export { APIError, composeMiddlewareList };
+export { APIError, composeMiddlewareList, getPaginationData };
 export type { TypeAPIBody, TypeMiddleware, TypeTransaction };
