@@ -25,11 +25,6 @@ const dbMiddleware: TypeMiddleware = function (next) {
 
     reply.send(res);
 
-    // set cookie
-    // const cookieHeaderToSend = getCookieHeader(responseNext);
-    // response.headers.set("Set-Cookie", cookieHeaderToSend);
-
-    // all set, return
     return res;
   };
 };

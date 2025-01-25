@@ -1,5 +1,7 @@
 import bcrypt from "bcryptjs";
-import type { TypeTransaction } from "./apiUtils.ts";
+import { APIError, type TypeTransaction } from "./apiUtils.ts";
+import type { FastifyReply } from "fastify";
+import { COOKIE_NAME_ACCESS_TOKEN } from "../../shared/constants.ts";
 
 // Encrypts a plain password using bcrypt.
 export async function encryptPassword(plainPassword: string) {
@@ -64,3 +66,12 @@ export const getSessionData = async (trx: TypeTransaction, userId: string) => {
 
   return session;
 };
+
+export function forceLogout(reply: FastifyReply) {
+  reply.clearCookie(COOKIE_NAME_ACCESS_TOKEN);
+  return new APIError({
+    statusCode: 401,
+    data: null,
+    displayMessage: "Session expired, please re-login.",
+  });
+}
