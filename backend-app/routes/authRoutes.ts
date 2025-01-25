@@ -27,7 +27,10 @@ export default async function (fastify: FastifyInstance) {
 
       const user = await request.trx.user.findFirst({
         where: {
-          email: bodyRequest.email,
+          email: {
+            equals: bodyRequest.email,
+            mode: "insensitive",
+          },
         },
         select: {
           id: true,

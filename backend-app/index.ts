@@ -13,6 +13,7 @@ dotenv.config();
 const fastify = Fastify();
 fastify.register(fastifyCors, {
   origin: true,
+  credentials: true,
 });
 fastify.register(fastifyCookie);
 
