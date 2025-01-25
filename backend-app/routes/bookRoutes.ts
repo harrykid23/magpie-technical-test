@@ -12,12 +12,19 @@ import type {
   TypeResponseGetBookList,
 } from "../../shared/types.ts";
 import type { Prisma } from "@prisma/client";
+import authMiddleware from "../middlewares/authMiddleware.ts";
+import generatePermissionMiddleware from "../middlewares/permissionMiddleware.ts";
+import { PERMISSION_NAME } from "../../shared/constants.ts";
 
 export default async function (fastify: FastifyInstance) {
   // Get all books
   fastify.post(
     "/",
-    composeMiddlewareList(dbMiddleware)(async (request, reply) => {
+    composeMiddlewareList(
+      dbMiddleware,
+      authMiddleware,
+      generatePermissionMiddleware([PERMISSION_NAME.read_book])
+    )(async (request, reply) => {
       const bodyRequest = request.body as TypeRequestGetTable;
       const { currentPage, itemPerPage } = getPaginationData(bodyRequest);
 
@@ -96,7 +103,11 @@ export default async function (fastify: FastifyInstance) {
   // Create book
   fastify.post(
     "/create",
-    composeMiddlewareList(dbMiddleware)(async (request, reply) => {
+    composeMiddlewareList(
+      dbMiddleware,
+      authMiddleware,
+      generatePermissionMiddleware([PERMISSION_NAME.create_book])
+    )(async (request, reply) => {
       const bodyRequest = request.body as TypeRequestCreateBook;
 
       const book: TypeResponseCreateBook = await request.trx.book.create({
