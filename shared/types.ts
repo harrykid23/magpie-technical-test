@@ -99,6 +99,15 @@ export type TypeResponseUpdateBook = {
   };
 };
 
+export type TypeRequestGetCategoryList = {
+  search: string;
+};
+
+export type TypeResponseGetCategoryList = {
+  id: string;
+  name: string;
+}[];
+
 // LENDING MANAGEMENT
 export type TypeResponseGetLendingList = {
   id: string;
@@ -168,3 +177,14 @@ export type TypeResponseReturnLending = {
   dueDate: Date;
   returnDate: Date | null;
 };
+
+export type TypeRequestGetMemberList = {
+  search: string;
+};
+
+export type TypeResponseGetMemberList = {
+  email: string;
+  name: string;
+  id: string;
+  phone: string | null;
+}[];

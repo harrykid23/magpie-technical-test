@@ -8,10 +8,12 @@ import dbMiddleware from "../middlewares/dbMiddleware.ts";
 import type { FastifyInstance } from "fastify";
 import type {
   TypeRequestCreateBook,
+  TypeRequestGetCategoryList,
   TypeRequestGetTable,
   TypeRequestUpdateBook,
   TypeResponseCreateBook,
   TypeResponseGetBookList,
+  TypeResponseGetCategoryList,
   TypeResponseUpdateBook,
 } from "../../shared/types.ts";
 import type { Prisma } from "@prisma/client";
@@ -32,6 +34,9 @@ export default async function (fastify: FastifyInstance) {
       const { currentPage, itemPerPage } = getPaginationData(bodyRequest);
 
       const whereClause: Prisma.BookWhereInput = {
+        deletedAt: {
+          equals: null,
+        },
         OR: [
           {
             title: {
@@ -60,9 +65,6 @@ export default async function (fastify: FastifyInstance) {
             },
           },
         ],
-        deletedAt: {
-          equals: null,
-        },
       };
 
       const books: TypeResponseGetBookList = await request.trx.book.findMany({
@@ -258,6 +260,43 @@ export default async function (fastify: FastifyInstance) {
         statusCode: 200,
         data: null,
         message: "Book deleted successfully",
+      };
+
+      return res;
+    })
+  );
+
+  // Search categories
+  fastify.get(
+    "/category",
+    composeMiddlewareList(
+      dbMiddleware,
+      authMiddleware,
+      generatePermissionMiddleware([PERMISSION_NAME.create_book])
+    )(async (request, reply) => {
+      const queryRequest = request.query as TypeRequestGetCategoryList;
+
+      const whereClause: Prisma.CategoryWhereInput = {
+        name: {
+          contains: queryRequest.search,
+          mode: "insensitive",
+        },
+      };
+
+      const categories: TypeResponseGetCategoryList =
+        await request.trx.category.findMany({
+          select: {
+            id: true,
+            name: true,
+          },
+          where: whereClause,
+          take: 15,
+          orderBy: { name: "asc" },
+        });
+
+      const res: TypeAPIBody<TypeResponseGetCategoryList> = {
+        statusCode: 200,
+        data: categories,
       };
 
       return res;

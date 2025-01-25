@@ -31,6 +31,9 @@ export default async function (fastify: FastifyInstance) {
       const { currentPage, itemPerPage } = getPaginationData(bodyRequest);
 
       const whereClause: Prisma.LendingWhereInput = {
+        deletedAt: {
+          equals: null,
+        },
         OR: [
           {
             book: {
@@ -73,9 +76,6 @@ export default async function (fastify: FastifyInstance) {
             },
           },
         ],
-        deletedAt: {
-          equals: null,
-        },
       };
 
       const lendings: TypeResponseGetLendingList =
