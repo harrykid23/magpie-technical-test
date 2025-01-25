@@ -25,6 +25,7 @@ class APIError extends Error {
 }
 
 type TypeMiddleware = (next: RouteHandlerMethod) => RouteHandlerMethod;
+type TypeMiddlewareGenerator<TArgs> = (args: TArgs) => TypeMiddleware;
 
 type TypeMiddlewareComposer = (
   ...middlewareList: TypeMiddleware[]
@@ -58,4 +59,9 @@ const getPaginationData = (data: TypeRequestGetTable) => {
 
 export default null;
 export { APIError, composeMiddlewareList, getPaginationData };
-export type { TypeAPIBody, TypeMiddleware, TypeTransaction };
+export type {
+  TypeAPIBody,
+  TypeMiddleware,
+  TypeTransaction,
+  TypeMiddlewareGenerator,
+};
