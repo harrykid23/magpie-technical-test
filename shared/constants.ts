@@ -13,3 +13,5 @@ export const PERMISSION_NAME = {
 };
 
 export const PAGINATION_MAX_ITEM_PER_PAGE = 100;
+
+export const COOKIE_NAME_ACCESS_TOKEN = "access_token";

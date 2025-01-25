@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-const ENCRYPTION_KEY = process.env.JWT_SALT as string;
+const ENCRYPTION_KEY = process.env.JWT_SECRET as string;
 
 // Function to generate a JWT from an object
 export const generateJWT = (data: object, expiresIn: number) => {

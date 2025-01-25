@@ -1,3 +1,5 @@
+import type { TypeSession } from "../backend-app/utils/authUtils.ts";
+
 // GENERAL
 export type TypePagination = {
   currentPage: number;
@@ -13,6 +15,14 @@ export type TypeRequestGetTable = TypePagination & {
     }[];
   };
 };
+
+// AUTH
+export type TypeRequestLogin = {
+  email: string;
+  password: string;
+};
+
+export type TypeResponseLogin = TypeSession;
 
 // BOOK MANAGEMENT
 export type TypeResponseGetBookList = {

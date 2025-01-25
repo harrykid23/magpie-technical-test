@@ -17,36 +17,28 @@ export async function checkPassword(
 }
 
 export type TypeSession = {
-  id: string;
-  username: string;
-  name: string;
-  office: {
-    id: string;
-    name: string;
-    shortName: string;
-    createdAt: Date;
-    modifiedAt: Date;
-  };
   role: {
     id: string;
     name: string;
-    MapRolePermission: {
+    mapRolePermissions: {
       permission: {
         id: string;
-        shortName: string;
-        moduleName: string;
+        name: string;
       };
     }[];
   };
-  password: string;
+  id: string;
+  name: string;
 };
 
 export const getSessionData = async (trx: TypeTransaction, userId: string) => {
-  const session = await trx.user.findFirst({
+  const session = (await trx.user.findFirst({
     where: {
       id: userId,
     },
-    include: {
+    select: {
+      id: true,
+      name: true,
       role: {
         select: {
           id: true,
@@ -55,6 +47,7 @@ export const getSessionData = async (trx: TypeTransaction, userId: string) => {
             select: {
               permission: {
                 select: {
+                  id: true,
                   name: true,
                 },
               },
@@ -63,10 +56,10 @@ export const getSessionData = async (trx: TypeTransaction, userId: string) => {
         },
       },
     },
-  });
+  })) as TypeSession;
 
   if (!session) {
-    throw new Error("invalid refresh token");
+    throw new Error("invalid access token");
   }
 
   return session;

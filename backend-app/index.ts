@@ -3,6 +3,8 @@ import bookRoutes from "./routes/bookRoutes.ts";
 import { APIError, type TypeAPIBody } from "./utils/apiUtils.ts";
 import dotenv from "dotenv";
 import fastifyCors from "@fastify/cors";
+import fastifyCookie from "@fastify/cookie";
+import authRoutes from "./routes/authRoutes.ts";
 
 // init fastify
 dotenv.config();
@@ -10,6 +12,7 @@ const fastify = Fastify();
 fastify.register(fastifyCors, {
   origin: true,
 });
+fastify.register(fastifyCookie);
 
 // set global error handler
 fastify.setErrorHandler((error, request, reply) => {
@@ -29,6 +32,7 @@ fastify.setErrorHandler((error, request, reply) => {
 });
 
 // Register routes
+fastify.register(authRoutes, { prefix: "/auth" });
 fastify.register(bookRoutes, { prefix: "/book" });
 
 // start the server
