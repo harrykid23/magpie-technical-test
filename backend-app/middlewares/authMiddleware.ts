@@ -2,11 +2,8 @@ import type { TypeMiddleware } from "../utils/apiUtils.ts";
 import type { FastifyInstance } from "fastify";
 import { COOKIE_NAME_ACCESS_TOKEN } from "../../shared/constants.ts";
 import { verifyJWT } from "../utils/jwtUtils.ts";
-import {
-  forceLogout,
-  getSessionData,
-  type TypeSession,
-} from "../utils/authUtils.ts";
+import { forceLogout, getSessionData } from "../utils/authUtils.ts";
+import type { TypeSession } from "../../shared/types.ts";
 
 const authMiddleware: TypeMiddleware = function (next) {
   return async function (this: FastifyInstance, request, reply) {

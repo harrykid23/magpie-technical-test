@@ -1,5 +1,3 @@
-import type { TypeSession } from "../backend-app/utils/authUtils.ts";
-
 // GENERAL
 export type TypePagination = {
   currentPage: number;
@@ -11,7 +9,7 @@ export type TypeRequestGetTable = TypePagination & {
   option?: {
     search?: string;
     orderBy?: {
-      [key: string]: "asc" | "desc"; // Sort by the 'name' field in ascending order
+      [key: string]: "asc" | "desc"; // Sort by the [key] field in ascending order
     }[];
   };
 };
@@ -20,6 +18,21 @@ export type TypeRequestGetTable = TypePagination & {
 export type TypeRequestLogin = {
   email: string;
   password: string;
+};
+
+export type TypeSession = {
+  role: {
+    id: string;
+    name: string;
+    mapRolePermissions: {
+      permission: {
+        id: string;
+        name: string;
+      };
+    }[];
+  };
+  id: string;
+  name: string;
 };
 
 export type TypeResponseLogin = TypeSession;

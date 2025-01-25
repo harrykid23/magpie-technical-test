@@ -1,6 +1,6 @@
 import { FastifyRequest } from "fastify";
 import type { TypeTransaction } from "./apiUtils.ts";
-import type { TypeSession } from "./authUtils.ts";
+import type { TypeSession } from "../../shared/types.ts";
 
 // Extend the FastifyRequest type
 declare module "fastify" {

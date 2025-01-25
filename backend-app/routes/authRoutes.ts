@@ -1,21 +1,16 @@
 import {
   APIError,
   composeMiddlewareList,
-  getPaginationData,
   type TypeAPIBody,
 } from "../utils/apiUtils.ts";
 import dbMiddleware from "../middlewares/dbMiddleware.ts";
 import type { FastifyInstance } from "fastify";
-import type { Prisma } from "@prisma/client";
 import type {
   TypeRequestLogin,
   TypeResponseLogin,
+  TypeSession,
 } from "../../shared/types.ts";
-import {
-  checkPassword,
-  getSessionData,
-  type TypeSession,
-} from "../utils/authUtils.ts";
+import { checkPassword, getSessionData } from "../utils/authUtils.ts";
 import { COOKIE_NAME_ACCESS_TOKEN } from "../../shared/constants.ts";
 import { generateJWT } from "../utils/jwtUtils.ts";
 

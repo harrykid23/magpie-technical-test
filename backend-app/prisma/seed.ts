@@ -1,7 +1,6 @@
-import { Prisma, PrismaClient, type Category } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { encryptPassword } from "../utils/authUtils.ts";
 import { PERMISSION_NAME } from "../../shared/constants.ts";
-import type { TypeTransaction } from "../utils/apiUtils.ts";
 import { generateBooks } from "./generateRandomBook.ts";
 import { generateLendings } from "./generateRandomLending.ts";
 

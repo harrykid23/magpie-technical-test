@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { APIError, type TypeTransaction } from "./apiUtils.ts";
 import type { FastifyReply } from "fastify";
 import { COOKIE_NAME_ACCESS_TOKEN } from "../../shared/constants.ts";
+import type { TypeSession } from "../../shared/types.ts";
 
 // Encrypts a plain password using bcrypt.
 export async function encryptPassword(plainPassword: string) {
@@ -17,21 +18,6 @@ export async function checkPassword(
 ) {
   return bcrypt.compare(plainPassword, hashedPassword);
 }
-
-export type TypeSession = {
-  role: {
-    id: string;
-    name: string;
-    mapRolePermissions: {
-      permission: {
-        id: string;
-        name: string;
-      };
-    }[];
-  };
-  id: string;
-  name: string;
-};
 
 export const getSessionData = async (trx: TypeTransaction, userId: string) => {
   const session = (await trx.user.findFirst({
