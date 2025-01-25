@@ -62,3 +62,26 @@ export type TypeResponseCreateBook = {
     name: string;
   };
 };
+
+export type TypeRequestUpdateBook = {
+  title: string;
+  author: string;
+  isbn: string;
+  quantity: number;
+  categoryId: string;
+};
+
+export type TypeResponseUpdateBook = {
+  category: {
+    id: string;
+    name: string;
+  };
+  id: string;
+  title: string;
+  author: string;
+  isbn: string;
+  quantity: number;
+  createdBy: {
+    name: string;
+  };
+};

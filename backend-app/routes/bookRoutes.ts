@@ -1,4 +1,5 @@
 import {
+  APIError,
   composeMiddlewareList,
   getPaginationData,
   type TypeAPIBody,
@@ -8,8 +9,10 @@ import type { FastifyInstance } from "fastify";
 import type {
   TypeRequestCreateBook,
   TypeRequestGetTable,
+  TypeRequestUpdateBook,
   TypeResponseCreateBook,
   TypeResponseGetBookList,
+  TypeResponseUpdateBook,
 } from "../../shared/types.ts";
 import type { Prisma } from "@prisma/client";
 import authMiddleware from "../middlewares/authMiddleware.ts";
@@ -137,6 +140,124 @@ export default async function (fastify: FastifyInstance) {
       const res: TypeAPIBody<TypeResponseCreateBook> = {
         statusCode: 200,
         data: book,
+        displayMessage: "Book created successfully.",
+      };
+
+      return res;
+    })
+  );
+
+  // Update book
+  fastify.put(
+    "/:bookId",
+    composeMiddlewareList(
+      dbMiddleware,
+      authMiddleware,
+      generatePermissionMiddleware([PERMISSION_NAME.update_book])
+    )(async (request, reply) => {
+      const { bookId } = request.params as { bookId: string };
+      if (!bookId) {
+        throw new APIError({
+          statusCode: 400,
+          data: null,
+          displayMessage: "Book ID cannot be empty!",
+        });
+      }
+      const bodyRequest = request.body as TypeRequestUpdateBook;
+
+      const book: TypeResponseUpdateBook[] =
+        await request.trx.book.updateManyAndReturn({
+          where: {
+            id: bookId,
+            deletedAt: {
+              equals: null,
+            },
+          },
+          select: {
+            id: true,
+            title: true,
+            author: true,
+            isbn: true,
+            quantity: true,
+            category: true,
+            createdBy: {
+              select: {
+                name: true,
+              },
+            },
+          },
+          data: {
+            title: bodyRequest.title,
+            author: bodyRequest.author,
+            isbn: bodyRequest.isbn,
+            quantity: bodyRequest.quantity,
+            categoryId: bodyRequest.categoryId,
+          },
+        });
+
+      if (!book.length) {
+        throw new APIError({
+          statusCode: 404,
+          data: null,
+          displayMessage: "Book ID not found!",
+        });
+      }
+
+      const res: TypeAPIBody<TypeResponseUpdateBook> = {
+        statusCode: 200,
+        data: book[0],
+        displayMessage: "Book updated successfully.",
+      };
+
+      return res;
+    })
+  );
+
+  // Delete book
+  fastify.delete(
+    "/:bookId",
+    composeMiddlewareList(
+      dbMiddleware,
+      authMiddleware,
+      generatePermissionMiddleware([PERMISSION_NAME.delete_book])
+    )(async (request, reply) => {
+      const { bookId } = request.params as { bookId: string };
+      if (!bookId) {
+        throw new APIError({
+          statusCode: 400,
+          data: null,
+          displayMessage: "Book ID cannot be empty!",
+        });
+      }
+
+      const book = await request.trx.book.updateManyAndReturn({
+        where: {
+          id: bookId,
+          deletedAt: {
+            equals: null,
+          },
+        },
+        select: {
+          id: true,
+        },
+        data: {
+          deletedAt: new Date().toISOString(),
+          deletedById: request.session.id,
+        },
+      });
+
+      if (!book.length) {
+        throw new APIError({
+          statusCode: 404,
+          data: null,
+          displayMessage: "Book ID not found!",
+        });
+      }
+
+      const res: TypeAPIBody<null> = {
+        statusCode: 200,
+        data: null,
+        message: "Book deleted successfully",
       };
 
       return res;
