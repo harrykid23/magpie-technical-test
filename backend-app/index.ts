@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import fastifyCors from "@fastify/cors";
 import fastifyCookie from "@fastify/cookie";
 import authRoutes from "./routes/authRoutes.ts";
+import lendingRoutes from "./routes/lendingRoutes.ts";
 
 // init fastify
 dotenv.config();
@@ -34,6 +35,7 @@ fastify.setErrorHandler((error, request, reply) => {
 // Register routes
 fastify.register(authRoutes, { prefix: "/auth" });
 fastify.register(bookRoutes, { prefix: "/book" });
+fastify.register(lendingRoutes, { prefix: "/lending" });
 
 // start the server
 const start = async () => {

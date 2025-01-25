@@ -85,3 +85,73 @@ export type TypeResponseUpdateBook = {
     name: string;
   };
 };
+
+// LENDING MANAGEMENT
+export type TypeResponseGetLendingList = {
+  id: string;
+  createdAt: Date;
+  createdBy: {
+    name: string;
+  };
+  member: {
+    name: string;
+    email: string;
+    phone: string | null;
+  };
+  book: {
+    id: string;
+    title: string;
+    author: string;
+    isbn: string;
+  };
+  dueDate: Date;
+  returnDate: Date | null;
+}[];
+
+export type TypeRequestCreateLending = {
+  bookId: string;
+  memberId: string;
+  dueDate: string;
+};
+
+export type TypeResponseCreateLending = {
+  id: string;
+  createdAt: Date;
+  createdBy: {
+    name: string;
+  };
+  member: {
+    name: string;
+    email: string;
+    phone: string | null;
+  };
+  book: {
+    id: string;
+    title: string;
+    author: string;
+    isbn: string;
+  };
+  dueDate: Date;
+  returnDate: Date | null;
+};
+
+export type TypeResponseReturnLending = {
+  id: string;
+  createdAt: Date;
+  createdBy: {
+    name: string;
+  };
+  member: {
+    name: string;
+    email: string;
+    phone: string | null;
+  };
+  book: {
+    id: string;
+    title: string;
+    author: string;
+    isbn: string;
+  };
+  dueDate: Date;
+  returnDate: Date | null;
+};
