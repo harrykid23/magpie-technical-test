@@ -13,6 +13,8 @@ import { redirect } from "next/navigation";
 import { LOCALSTORAGE_NAME_IS_LOGGED_IN } from "@/utils/constants.ts";
 import { RootState } from "@/store/store.ts";
 import { useSelector } from "react-redux";
+import { TypeSession } from "@shared/types.ts";
+import { TypeAPIBody } from "../../../../backend-app/utils/apiUtils.ts";
 
 const schema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -36,17 +38,19 @@ export default function LoginForm() {
   const dispatch = useDispatch();
   const session = useSelector((state: RootState) => state.session.session);
   const { showToast } = useToast();
-  const { isLoading: isLoadingLogin, fetchData: login } =
-    buildApiCaller("/auth/login");
+  const { isLoading: isLoadingLogin, fetchData: login } = buildApiCaller<
+    any,
+    TypeAPIBody<TypeSession>
+  >("/auth/login");
   const onSubmit = (data: FormData) => {
     login({
       method: "POST",
       body: data,
       callback: (result, isError) => {
         if (isError) {
-          showToast("error", result?.displayMessage);
+          showToast("error", result?.displayMessage || "");
         } else {
-          dispatch(setSession(result));
+          dispatch(setSession(result.data));
         }
       },
     });

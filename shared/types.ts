@@ -33,6 +33,7 @@ export type TypeSession = {
   };
   id: string;
   name: string;
+  email: string;
 };
 
 export type TypeResponseLogin = TypeSession;

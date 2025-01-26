@@ -30,13 +30,14 @@ export const generateAccessTokenFromSessionData = (
 };
 
 export const getSessionData = async (trx: TypeTransaction, userId: string) => {
-  const session = (await trx.user.findFirst({
+  const session: TypeSession | null = await trx.user.findFirst({
     where: {
       id: userId,
     },
     select: {
       id: true,
       name: true,
+      email: true,
       role: {
         select: {
           id: true,
@@ -54,7 +55,7 @@ export const getSessionData = async (trx: TypeTransaction, userId: string) => {
         },
       },
     },
-  })) as TypeSession;
+  });
 
   if (!session) {
     throw new Error("invalid access token");
