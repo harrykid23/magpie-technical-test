@@ -52,21 +52,27 @@ export default function DashboardLayout({
   const { isLoading: isLoadingSession, fetchData: getSessionData } =
     buildApiCaller<any, TypeAPIBody<TypeSession>>("/auth/getSessionData");
   const { showToast } = useToast();
+  const forceLogout = (toastMessage?: string) => {
+    if (toastMessage) {
+      showToast("error", toastMessage);
+    }
+    dispatch(setSession(null));
+    localStorage.removeItem(LOCALSTORAGE_NAME_IS_LOGGED_IN);
+    redirect("/");
+  };
 
   useEffect(() => {
     // set session data not exist in store while logged in
     const isLoggedIn = localStorage.getItem(LOCALSTORAGE_NAME_IS_LOGGED_IN);
     if (!isLoggedIn) {
-      return redirect("/");
+      redirect("/");
     }
     if (!session) {
       getSessionData({
         method: "GET",
         callback(result, isError) {
           if (isError) {
-            showToast("error", result.displayMessage as string);
-            localStorage.removeItem(LOCALSTORAGE_NAME_IS_LOGGED_IN);
-            redirect("/");
+            forceLogout(result.displayMessage);
           } else {
             dispatch(setSession(result.data));
           }
@@ -179,8 +185,7 @@ export default function DashboardLayout({
                   <DropdownMenu.Separator />
                   <DropdownMenu.Item
                     onSelect={() => {
-                      // Handle logout logic here
-                      console.log("Logged out");
+                      forceLogout();
                     }}
                     className="!text-red-600 hover:bg-red-50"
                   >
