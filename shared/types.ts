@@ -1,11 +1,16 @@
 // GENERAL
 export type TypePagination = {
   currentPage: number;
+  itemPerPage: number;
   maxPage: number;
+};
+
+export type TypePaginationRequest = {
+  currentPage: number;
   itemPerPage: number;
 };
 
-export type TypeRequestGetTable = TypePagination & {
+export type TypeRequestGetTable = TypePaginationRequest & {
   option?: {
     search?: string;
     orderBy?: {
