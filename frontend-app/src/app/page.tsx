@@ -17,7 +17,6 @@ export default function LoginPage() {
             weight="bold"
             className="text-blue-600"
             align="center"
-            // style={{ fontFamily: "monospace" }}
           >
             Library Management System
           </Text>

@@ -5,29 +5,31 @@ axios.defaults.baseURL = process.env.NEXT_PUBLIC_BACKEND_URL;
 axios.defaults.withCredentials = true;
 
 // Define the type for the options object
-interface CallApiOptions<TBody = Record<string, any>> {
+interface CallApiOptions<TBody = Record<string, any>, TResult = any> {
   method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
   queryParams?: Record<string, string | number | boolean>;
   body?: TBody;
-  callback?: (result: any, isError: boolean) => void;
+  callback?: (result: TResult, isError: boolean) => void;
   axiosConfig?: AxiosRequestConfig;
 }
 
-// Define the return type of the callApi function
-interface CallApiResult<TResult = any> {
+// Define the return type of the buildApiCaller function
+interface CallApiResult<TBody = Record<string, any>, TResult = any> {
   result: TResult | null;
   isLoading: boolean;
   isError: boolean;
-  fetchData: (options: CallApiOptions) => void;
+  fetchData: (options: CallApiOptions<TBody, TResult>) => void;
 }
 
-// The callApi function
-const callApi = <TResult = any>(url: string): CallApiResult<TResult> => {
+// The buildApiCaller function
+const buildApiCaller = <TBody = Record<string, any>, TResult = any>(
+  url: string
+): CallApiResult<TBody, TResult> => {
   const [result, setResult] = useState<TResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
-  const fetchData = async (options: CallApiOptions = {}) => {
+  const fetchData = async (options: CallApiOptions<TBody, TResult> = {}) => {
     setIsLoading(true);
     const {
       method = "GET",
@@ -75,4 +77,4 @@ const callApi = <TResult = any>(url: string): CallApiResult<TResult> => {
   return { result, isLoading, isError, fetchData };
 };
 
-export default callApi;
+export default buildApiCaller;
