@@ -11,14 +11,16 @@ import {
   TypeResponseGetBookList,
 } from "@shared/types.ts";
 import { TypeAPIBody } from "../../../../../backend-app/utils/apiUtils.ts";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store.ts";
 import { PERMISSION_NAME } from "@shared/constants.ts";
 import { Pencil1Icon, TrashIcon } from "@radix-ui/react-icons";
 import { useToast } from "@/component/general/customToast.tsx";
+import AddBookButton from "@/component/book-management/addBookButton.tsx";
 
 export default function Dashboard() {
+  // table data
   const session = useSelector((state: RootState) => state.session.session);
   const userPermissionSet = new Set(
     session?.role.mapRolePermissions.map(
@@ -96,6 +98,7 @@ export default function Dashboard() {
     },
   ];
 
+  // get table data functions
   const {
     isLoading: isLoadingBookList,
     result: resultBookList,
@@ -109,6 +112,9 @@ export default function Dashboard() {
     maxPage: 1,
     itemPerPage: 10,
   });
+  const [refreshDataFunction, setRefreshDataFunction] = useState<
+    (() => void) | null
+  >(null);
 
   const { showToast } = useToast();
 
@@ -121,6 +127,9 @@ export default function Dashboard() {
       <h2 className="text-2xl font-semibold text-gray-700 mb-4">
         Book Management
       </h2>
+      <Flex direction={"row"} justify="end" width={"100%"}>
+        <AddBookButton refreshTable={refreshDataFunction} />
+      </Flex>
       <CustomTable<TypeResponseGetBookList>
         data={resultBookList?.data || []}
         isLoading={isLoadingBookList}
@@ -145,6 +154,7 @@ export default function Dashboard() {
         }}
         pagination={pagination}
         searchPlaceholder="Search title, author, ISBN, or category..."
+        setRefreshDataFunction={setRefreshDataFunction}
       />
     </Flex>
   );

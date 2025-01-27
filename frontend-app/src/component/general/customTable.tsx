@@ -1,5 +1,11 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  Dispatch,
+  SetStateAction,
+} from "react";
 import {
   Table,
   TextField,
@@ -30,6 +36,7 @@ interface CustomTableProps<TDataList extends any[]> {
   data: TDataList;
   isLoading: boolean;
   searchPlaceholder?: string;
+  setRefreshDataFunction?: Dispatch<SetStateAction<(() => void) | null>>;
 }
 
 type SortConfig = {
@@ -44,6 +51,7 @@ const CustomTable = <TDataList extends any[]>({
   isLoading,
   pagination,
   searchPlaceholder,
+  setRefreshDataFunction,
 }: CustomTableProps<TDataList>): React.ReactElement => {
   const [tempSearchTerm, setTempSearchTerm] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -93,6 +101,7 @@ const CustomTable = <TDataList extends any[]>({
       }
     };
 
+    setRefreshDataFunction?.((prevState) => loadData);
     loadData();
   }, [searchTerm, sortConfigs, currentPage, itemPerPage]);
 
