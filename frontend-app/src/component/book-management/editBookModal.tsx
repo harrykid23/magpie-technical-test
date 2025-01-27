@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PlusIcon } from "@radix-ui/react-icons";
 import { Button, Dialog, Flex, Text, TextField } from "@radix-ui/themes";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -7,15 +6,19 @@ import { useToast } from "../general/customToast.tsx";
 import buildApiCaller from "@/hook/apiHook.ts";
 import { TypeAPIBody } from "../../../../backend-app/utils/apiUtils.ts";
 import {
-  TypeRequestCreateBook,
   TypeRequestGetCategoryList,
+  TypeRequestUpdateBook,
+  TypeResponseGetBookList,
   TypeResponseGetCategoryList,
 } from "@shared/types.ts";
 import SelectWithSearch from "../general/selectWithSearch.tsx";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useEffect } from "react";
 
-interface AddBookButtonProps {
+interface EditBookModalProps {
   refreshTable: (() => void) | null;
+  bookData: TypeResponseGetBookList[number] | null;
+  isModalOpen: boolean;
+  setIsModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 const schema = z.object({
@@ -29,7 +32,12 @@ const schema = z.object({
 // Infer the type from the schema
 type FormData = z.infer<typeof schema>;
 
-export default function AddBookButton({ refreshTable }: AddBookButtonProps) {
+export default function EditBookModal({
+  refreshTable,
+  bookData,
+  isModalOpen,
+  setIsModalOpen,
+}: EditBookModalProps) {
   // form validation
   const {
     register,
@@ -42,16 +50,15 @@ export default function AddBookButton({ refreshTable }: AddBookButtonProps) {
     resolver: zodResolver(schema),
   });
 
-  // form modal
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
   // form submission
   const { showToast } = useToast();
-  const { isLoading: isLoadingCreateBook, fetchData: createBook } =
-    buildApiCaller<TypeRequestCreateBook, TypeAPIBody<any>>("/book/create");
+  const { isLoading: isLoadingEditBook, fetchData: editBook } = buildApiCaller<
+    TypeRequestUpdateBook,
+    TypeAPIBody<any>
+  >(`/book/${bookData?.id}`);
   const onSubmit = (data: FormData) => {
-    createBook({
-      method: "POST",
+    editBook({
+      method: "PUT",
       body: {
         title: data.title,
         author: data.author,
@@ -63,7 +70,7 @@ export default function AddBookButton({ refreshTable }: AddBookButtonProps) {
         if (isError) {
           showToast("error", result?.displayMessage || "");
         } else {
-          showToast("success", "New book added successfully");
+          showToast("success", "Book edited successfully");
           setIsModalOpen(false);
           reset();
           refreshTable?.();
@@ -77,20 +84,40 @@ export default function AddBookButton({ refreshTable }: AddBookButtonProps) {
     TypeAPIBody<TypeResponseGetCategoryList>
   >("/book/category");
 
+  // set default data
+  useEffect(() => {
+    setValue("title", bookData?.title || "");
+    setValue("author", bookData?.author || "");
+    setValue("isbn", bookData?.isbn || "");
+    setValue("quantity", bookData?.quantity || 0);
+    setValue("categoryId", bookData?.category.id || "");
+  }, [bookData]);
+
+  const categoryListWithDefaultOption = [
+    ...(bookData?.category.id
+      ? [
+          {
+            value: bookData.category.id,
+            label: bookData.category.name,
+          },
+        ]
+      : []),
+    ...(categoryList?.data
+      .map((category) => ({
+        value: category.id,
+        label: category.name,
+      }))
+      .filter((category) => category.value !== bookData?.category.id) || []),
+  ];
+
   return (
     <Dialog.Root open={isModalOpen}>
-      <Dialog.Trigger>
-        <Button onClick={() => setIsModalOpen(true)}>
-          <PlusIcon /> Add Book
-        </Button>
-      </Dialog.Trigger>
-
       <Dialog.Content
         maxWidth="450px"
         onInteractOutside={() => setIsModalOpen(false)}
       >
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Dialog.Title>Add Book</Dialog.Title>
+          <Dialog.Title>Edit Book</Dialog.Title>
           {/* <Dialog.Description size="2" mb="4">
           Make changes to your profile.
         </Dialog.Description> */}
@@ -165,12 +192,7 @@ export default function AddBookButton({ refreshTable }: AddBookButtonProps) {
                     },
                   });
                 }}
-                options={
-                  categoryList?.data.map((category) => ({
-                    value: category.id,
-                    label: category.name,
-                  })) || []
-                }
+                options={categoryListWithDefaultOption}
                 register={register}
                 name="categoryId"
                 placeholder="Search category..."
@@ -197,8 +219,8 @@ export default function AddBookButton({ refreshTable }: AddBookButtonProps) {
                 Cancel
               </Button>
             </Dialog.Close>
-            <Button loading={isLoadingCreateBook} type="submit">
-              Add Book
+            <Button loading={isLoadingEditBook} type="submit">
+              Edit Book
             </Button>
           </Flex>
         </form>

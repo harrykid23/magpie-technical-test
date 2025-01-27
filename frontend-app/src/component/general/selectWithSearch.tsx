@@ -1,6 +1,6 @@
 import { Text, TextField } from "@radix-ui/themes";
 import React, { useState, useEffect, useRef } from "react";
-import { UseFormSetValue } from "react-hook-form";
+import { UseFormSetValue, UseFormWatch } from "react-hook-form";
 
 interface ComboboxProps {
   fetchData: (searchTerm: string) => void;
@@ -8,6 +8,7 @@ interface ComboboxProps {
   name: string;
   options: { value: string; label: string }[];
   setValue: UseFormSetValue<any>;
+  value: any;
   placeholder?: string;
   required?: boolean;
   className?: string;
@@ -19,6 +20,7 @@ const SelectWithSearch: React.FC<ComboboxProps> = ({
   name,
   options,
   setValue,
+  value,
   placeholder = "Search...",
   required = false,
   className = "",
@@ -71,6 +73,14 @@ const SelectWithSearch: React.FC<ComboboxProps> = ({
     }
   }, [isOpen, options]);
 
+  useEffect(() => {
+    if (value) {
+      const option = options.find((option) => option.value === value);
+      setSearchTerm(option?.label || "");
+      setSelectedValue(option?.value || "");
+    }
+  }, [value]);
+
   return (
     <div ref={comboboxRef} className={`relative !mb-0 ${className}`}>
       {/* Input Field */}
@@ -98,8 +108,6 @@ const SelectWithSearch: React.FC<ComboboxProps> = ({
                 key={option.value}
                 className="p-2 cursor-pointer hover:bg-gray-100"
                 onClick={() => {
-                  setSearchTerm(option.label);
-                  setSelectedValue(option.value);
                   setValue(name, option.value);
                   setIsOpen({ value: false, isOptionClicked: true });
                 }}

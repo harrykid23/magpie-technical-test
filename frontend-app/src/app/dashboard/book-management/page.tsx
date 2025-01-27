@@ -18,6 +18,8 @@ import { PERMISSION_NAME } from "@shared/constants.ts";
 import { Pencil1Icon, TrashIcon } from "@radix-ui/react-icons";
 import { useToast } from "@/component/general/customToast.tsx";
 import AddBookButton from "@/component/book-management/addBookButton.tsx";
+import EditBookModal from "@/component/book-management/editBookModal.tsx";
+import DeleteBookModal from "@/component/book-management/deleteBookModal.tsx";
 
 export default function Dashboard() {
   // table data
@@ -80,6 +82,10 @@ export default function Dashboard() {
               <Button
                 color="orange"
                 className="hover:bg-orange-700 transition-al duration-300l"
+                onClick={() => {
+                  setSelectedBookData(row);
+                  setIsModalEditBookOpen(true);
+                }}
               >
                 <Pencil1Icon color="white" />
               </Button>
@@ -88,6 +94,10 @@ export default function Dashboard() {
               <Button
                 color="red"
                 className="hover:bg-red-600 transition-all duration-300"
+                onClick={() => {
+                  setSelectedBookData(row);
+                  setIsModalDeleteBookOpen(true);
+                }}
               >
                 <TrashIcon color="white" />
               </Button>
@@ -117,6 +127,15 @@ export default function Dashboard() {
   >(null);
 
   const { showToast } = useToast();
+
+  // edit book functions
+  const [selectedBookData, setSelectedBookData] = useState<
+    TypeResponseGetBookList[number] | null
+  >(null);
+  const [isModalEditBookOpen, setIsModalEditBookOpen] = useState(false);
+
+  // delete book functions
+  const [isModalDeleteBookOpen, setIsModalDeleteBookOpen] = useState(false);
 
   return (
     <Flex
@@ -155,6 +174,18 @@ export default function Dashboard() {
         pagination={pagination}
         searchPlaceholder="Search title, author, ISBN, or category..."
         setRefreshDataFunction={setRefreshDataFunction}
+      />
+      <EditBookModal
+        refreshTable={refreshDataFunction}
+        bookData={selectedBookData}
+        isModalOpen={isModalEditBookOpen}
+        setIsModalOpen={setIsModalEditBookOpen}
+      />
+      <DeleteBookModal
+        refreshTable={refreshDataFunction}
+        bookData={selectedBookData}
+        isModalOpen={isModalDeleteBookOpen}
+        setIsModalOpen={setIsModalDeleteBookOpen}
       />
     </Flex>
   );
