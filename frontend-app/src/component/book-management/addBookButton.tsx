@@ -88,6 +88,8 @@ export default function AddBookButton({ refreshTable }: AddBookButtonProps) {
 
       <Dialog.Content
         maxWidth="450px"
+        className="!overflow-visible"
+        onOpenAutoFocus={(e) => e.preventDefault()}
         onInteractOutside={() => setIsModalOpen(false)}
       >
         <form onSubmit={handleSubmit(onSubmit)}>

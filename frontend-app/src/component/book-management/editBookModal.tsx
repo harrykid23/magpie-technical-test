@@ -115,6 +115,8 @@ export default function EditBookModal({
     <Dialog.Root open={isModalOpen}>
       <Dialog.Content
         maxWidth="450px"
+        className="!overflow-visible"
+        onOpenAutoFocus={(e) => e.preventDefault()}
         onInteractOutside={() => setIsModalOpen(false)}
       >
         <form onSubmit={handleSubmit(onSubmit)}>

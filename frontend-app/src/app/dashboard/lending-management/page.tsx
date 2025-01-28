@@ -20,6 +20,7 @@ import { useToast } from "@/component/general/customToast.tsx";
 import { dateToString } from "@/utils/generalUtils.ts";
 import ReturnLendingModal from "@/component/lending-management/returnLendingModal.tsx";
 import DeleteLendingModal from "@/component/lending-management/deleteLendingModal.tsx";
+import AddLendingButton from "@/component/lending-management/addLendingButton.tsx";
 
 export default function Dashboard() {
   // table data
@@ -148,7 +149,7 @@ export default function Dashboard() {
                 <CheckCircledIcon color="white" />
               </Button>
             ) : null}
-            {userPermissionSet.has(PERMISSION_NAME.delete_book) ? (
+            {userPermissionSet.has(PERMISSION_NAME.delete_lending) ? (
               <Button
                 color="red"
                 className="hover:bg-red-600 transition-all duration-300"
@@ -207,9 +208,9 @@ export default function Dashboard() {
       <h2 className="text-2xl font-semibold text-gray-700 mb-4">
         Lending Management
       </h2>
-      {/* <Flex direction={"row"} justify="end" width={"100%"}>
+      <Flex direction={"row"} justify="end" width={"100%"}>
         <AddLendingButton refreshTable={refreshDataFunction} />
-      </Flex> */}
+      </Flex>
       <CustomTable<TypeResponseGetLendingList>
         data={resultLendingList?.data || []}
         isLoading={isLoadingLendingList}
