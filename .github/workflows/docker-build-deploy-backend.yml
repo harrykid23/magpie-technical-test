@@ -66,19 +66,18 @@ jobs:
           DOCKER_TAG=${GITHUB_REF##*/}
 
           build_and_push() {
-            local app_dir=$1
+            local docker_compose_file=$1
             local image_name=$2
 
-            cd $app_dir
-            docker-compose build
+            docker-compose -f $docker_compose_file up --build
             docker tag $image_name:latest $image_name:$DOCKER_TAG
             docker push $image_name:latest
             docker push $image_name:$DOCKER_TAG
             cd -
           }
 
-          build_and_push "backend-app" "${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_REPO }}/${{ env.DOCKER_IMAGE_NAME_BACKEND }}"
-          build_and_push "frontend-app" "${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_REPO }}/${{ env.DOCKER_IMAGE_NAME_FRONTEND }}"
+          build_and_push "docker-compose.backend.yml" "${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_REPO }}/${{ env.DOCKER_IMAGE_NAME_BACKEND }}"
+          build_and_push "docker-compose.frontend.yml" "${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_REPO }}/${{ env.DOCKER_IMAGE_NAME_FRONTEND }}"
 
   deploy:
     name: Deploy to Dokploy
