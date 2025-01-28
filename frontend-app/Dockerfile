@@ -17,7 +17,7 @@ RUN npm run build
 
 # Stage 3: Final (Run the application)
 FROM node:18-alpine AS final
-WORKDIR /app
+WORKDIR /app/frontend-app
 COPY --from=build /app/frontend-app/.next /app/frontend-app/.next
 COPY --from=build /app/frontend-app/node_modules /app/frontend-app/node_modules
 COPY --from=build /app/frontend-app/package*.json /app/frontend-app/
