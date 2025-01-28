@@ -11,7 +11,7 @@ import {
   TypeResponseGetBookList,
 } from "@shared/types.ts";
 import { TypeAPIBody } from "../../../../../backend-app/utils/apiUtils.ts";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store.ts";
 import { PERMISSION_NAME } from "@shared/constants.ts";
@@ -175,18 +175,23 @@ export default function Dashboard() {
         searchPlaceholder="Search title, author, ISBN, or category..."
         setRefreshDataFunction={setRefreshDataFunction}
       />
-      <EditBookModal
-        refreshTable={refreshDataFunction}
-        bookData={selectedBookData}
-        isModalOpen={isModalEditBookOpen}
-        setIsModalOpen={setIsModalEditBookOpen}
-      />
-      <DeleteBookModal
-        refreshTable={refreshDataFunction}
-        bookData={selectedBookData}
-        isModalOpen={isModalDeleteBookOpen}
-        setIsModalOpen={setIsModalDeleteBookOpen}
-      />
+      {userPermissionSet.has(PERMISSION_NAME.update_book) ? (
+        <EditBookModal
+          refreshTable={refreshDataFunction}
+          bookData={selectedBookData}
+          isModalOpen={isModalEditBookOpen}
+          setIsModalOpen={setIsModalEditBookOpen}
+        />
+      ) : null}
+
+      {userPermissionSet.has(PERMISSION_NAME.delete_book) ? (
+        <DeleteBookModal
+          refreshTable={refreshDataFunction}
+          bookData={selectedBookData}
+          isModalOpen={isModalDeleteBookOpen}
+          setIsModalOpen={setIsModalDeleteBookOpen}
+        />
+      ) : null}
     </Flex>
   );
 }
