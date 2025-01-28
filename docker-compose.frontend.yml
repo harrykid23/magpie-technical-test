@@ -3,5 +3,5 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: frontend-app/Dockerfile
     image: registry.cloudraya.com/ir-cr-harry-3924/magpie-frontend:latest

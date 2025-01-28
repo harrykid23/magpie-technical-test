@@ -2,10 +2,11 @@
 FROM node:18-alpine AS base
 
 WORKDIR /app
-COPY package*.json ./
+COPY ./backend-app /app/backend-app
+COPY ./shared /app/shared
+WORKDIR /app/backend-app
 RUN npm install --production
 RUN npm install prisma
-COPY . .
 RUN npx prisma generate
 
 # Stage 2: Build (Compile TypeScript to JavaScript)
@@ -13,17 +14,19 @@ FROM node:18-alpine AS build
 
 WORKDIR /app
 COPY --from=base /app /app
+WORKDIR /app/backend-app
 RUN npm run build
 
 # Stage 3: Final (Run the application)
 FROM node:18-alpine AS final
 
-WORKDIR /app
-COPY --from=build /app/dist /app/dist
-COPY --from=base /app/prisma /app/prisma
-COPY --from=base /app/package*.json /app/
-COPY --from=base /app/start.sh /app/start.sh
-COPY --from=base /app/.env /app/.env
+WORKDIR /app/backend-app
+COPY --from=build /app/backend-app/dist /app/backend-app/dist
+COPY --from=build /app/backend-app/node_modules /app/backend-app/node_modules
+COPY --from=build /app/backend-app/prisma /app/backend-app/prisma
+COPY --from=build /app/backend-app/package*.json /app/backend-app/
+COPY --from=build /app/backend-app/start.sh /app/backend-app/start.sh
+COPY --from=build /app/backend-app/.env /app/backend-app/.env
 
 EXPOSE 3000
 
