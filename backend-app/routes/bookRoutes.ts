@@ -15,6 +15,8 @@ import type {
   TypeResponseGetBookList,
   TypeResponseSearchCategoryList,
   TypeResponseUpdateBook,
+  TypeRequestSearchBookList,
+  TypeResponseSearchBookList,
 } from "../../shared/types.ts";
 import type { Prisma } from "@prisma/client";
 import authMiddleware from "../middlewares/authMiddleware.ts";
@@ -297,6 +299,72 @@ export default async function (fastify: FastifyInstance) {
       const res: TypeAPIBody<TypeResponseSearchCategoryList> = {
         statusCode: 200,
         data: categories,
+      };
+
+      return res;
+    })
+  );
+
+  // Search books
+  fastify.get(
+    "/",
+    composeMiddlewareList(
+      dbMiddleware,
+      authMiddleware,
+      generatePermissionMiddleware([PERMISSION_NAME.read_book])
+    )(async (request, reply) => {
+      const queryRequest = request.query as TypeRequestSearchBookList;
+
+      const whereClause: Prisma.BookWhereInput = {
+        deletedAt: {
+          equals: null,
+        },
+        OR: [
+          {
+            title: {
+              contains: queryRequest.search,
+              mode: "insensitive",
+            },
+          },
+          {
+            author: {
+              contains: queryRequest.search,
+              mode: "insensitive",
+            },
+          },
+          {
+            isbn: {
+              contains: queryRequest.search,
+              mode: "insensitive",
+            },
+          },
+        ],
+      };
+
+      const books: TypeResponseSearchBookList = await request.trx.book.findMany(
+        {
+          select: {
+            id: true,
+            title: true,
+            author: true,
+            isbn: true,
+            quantity: true,
+            category: true,
+            createdBy: {
+              select: {
+                name: true,
+              },
+            },
+          },
+          where: whereClause,
+          take: 15,
+          orderBy: { title: "asc" },
+        }
+      );
+
+      const res: TypeAPIBody<TypeResponseSearchBookList> = {
+        statusCode: 200,
+        data: books,
       };
 
       return res;

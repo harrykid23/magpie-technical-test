@@ -105,6 +105,25 @@ export type TypeResponseUpdateBook = {
   };
 };
 
+export type TypeRequestSearchBookList = {
+  search: string;
+};
+
+export type TypeResponseSearchBookList = {
+  category: {
+    id: string;
+    name: string;
+  };
+  id: string;
+  title: string;
+  author: string;
+  isbn: string;
+  quantity: number;
+  createdBy: {
+    name: string;
+  };
+}[];
+
 export type TypeRequestSearchCategoryList = {
   search: string;
 };
