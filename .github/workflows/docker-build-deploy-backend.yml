@@ -1,0 +1,108 @@
+name: Build and Deploy Docker Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_type:
+        type: choice
+        description: "Select build type"
+        required: true
+        default: "development"
+        options:
+          - "development"
+
+env:
+  DOCKER_REGISTRY: registry.cloudraya.com
+  DOCKER_REPO: ir-cr-harry-3924
+  DOKPLOY_SERVER_URL: https://dockerin.harrykid23.my.id/api/application.deploy
+  DOCKER_IMAGE_NAME_BACKEND: magpie-backend
+  DOCKER_IMAGE_NAME_FRONTEND: magpie-frontend
+  DOKPLOY_APP_ID_BACKEND: ${{ secrets.DOKPLOY_APP_ID_BACKEND }}
+  DOKPLOY_APP_ID_FRONTEND: ${{ secrets.DOKPLOY_APP_ID_BACKEND }}
+
+jobs:
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/download/$(curl -s https://api.github.com/repos/docker/compose/releases/latest | jq -r .tag_name)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version
+
+      - name: Determine Build Type
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            BUILD_TYPE="${{ github.event.inputs.build_type }}"
+            echo "Build Type: $BUILD_TYPE"
+          else
+            echo "This step is skipped, as we are not triggered by workflow_dispatch."
+            exit 0
+          fi
+
+          # Set environment based on the build type
+          if [[ "$BUILD_TYPE" == "production" ]]; then
+            echo "Using production environment variables"
+            echo "${{ vars['ENV_BACKEND_PRODUCTION'] }}" > ./backend-app/.env
+            echo "${{ vars['ENV_FRONTEND_PRODUCTION'] }}" > ./frontend-app/.env
+          else
+            echo "Using development environment variables"
+            echo "${{ vars['ENV_BACKEND_STAGING'] }}" > ./backend-app/.env
+            echo "${{ vars['ENV_FRONTEND_STAGING'] }}" > ./frontend-app/.env
+          fi
+
+      - name: Log in to Docker Registry
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login ${{ env.DOCKER_REGISTRY }} -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+
+      - name: Build and Push Docker Images
+        run: |
+          DOCKER_TAG=${GITHUB_REF##*/}
+
+          build_and_push() {
+            local app_dir=$1
+            local image_name=$2
+
+            cd $app_dir
+            docker-compose build
+            docker tag $image_name:latest $image_name:$DOCKER_TAG
+            docker push $image_name:latest
+            docker push $image_name:$DOCKER_TAG
+            cd -
+          }
+
+          build_and_push "backend-app" "${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_REPO }}/${{ env.DOCKER_IMAGE_NAME_BACKEND }}"
+          build_and_push "frontend-app" "${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_REPO }}/${{ env.DOCKER_IMAGE_NAME_FRONTEND }}"
+
+  deploy:
+    name: Deploy to Dokploy
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+
+    steps:
+      - name: Deploy to Dokploy
+        run: |
+          echo "Starting deployment to Dokploy..."
+          curl -X 'POST' \
+            '${{ env.DOKPLOY_SERVER_URL }}' \
+            -H 'accept: application/json' \
+            -H 'Content-Type: application/json' \
+            -H 'Authorization: Bearer ${{ secrets.DOKPLOY_API_KEY }}' \
+            -d '{
+              "applicationId": "${{ env.DOKPLOY_APP_ID_BACKEND }}"
+            }'
+          curl -X 'POST' \
+            '${{ env.DOKPLOY_SERVER_URL }}' \
+            -H 'accept: application/json' \
+            -H 'Content-Type: application/json' \
+            -H 'Authorization: Bearer ${{ secrets.DOKPLOY_API_KEY }}' \
+            -d '{
+              "applicationId": "${{ env.DOKPLOY_APP_ID_FRONTEND }}"
+            }'

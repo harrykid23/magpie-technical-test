@@ -1,0 +1,7 @@
+version: "3.9"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: registry.cloudraya.com/ir-cr-harry-3924/magpie-backend:latest

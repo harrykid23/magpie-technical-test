@@ -19,6 +19,7 @@ frontend-app/out/
 
 # production
 frontend-app/build
+backend-app/dist
 
 # misc
 .DS_Store
