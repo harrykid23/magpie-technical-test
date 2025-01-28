@@ -205,7 +205,7 @@ const CustomTable = <TDataList extends any[]>({
               align={"center"}
               justify={"center"}
             >
-              <Card className="flex flex-row gap-2 items-center justify-center">
+              <Card className="flex flex-row gap-2 items-center justify-center shadow-lg">
                 <Flex
                   direction={"row"}
                   gap="2"
@@ -228,6 +228,13 @@ const CustomTable = <TDataList extends any[]>({
                   <Table.ColumnHeaderCell
                     key={column.key}
                     onClick={() => column.sortable && handleSort(column.key)}
+                    className={`transition-all duration-300 ${
+                      column.sortable ? "hover:bg-slate-300" : ""
+                    } ${
+                      isLoading
+                        ? "!pointer-events-none !cursor-not-allowed"
+                        : ""
+                    }`}
                     style={{ cursor: column.sortable ? "pointer" : "default" }}
                   >
                     {column.label}
@@ -282,6 +289,7 @@ const CustomTable = <TDataList extends any[]>({
           <Select.Root
             value={itemPerPage.toString()}
             onValueChange={handleItemsPerPageChange}
+            disabled={isLoading}
           >
             <Select.Trigger />
             <Select.Content>
@@ -293,7 +301,7 @@ const CustomTable = <TDataList extends any[]>({
 
           <Flex gap="2" align="center">
             <Button
-              disabled={currentPage === 1}
+              disabled={isLoading || currentPage === 1}
               onClick={() => handlePageChange(currentPage - 1)}
             >
               Previous
@@ -309,13 +317,14 @@ const CustomTable = <TDataList extends any[]>({
                   min={1}
                   max={pagination.maxPage}
                   className="w-10 text-center"
+                  disabled={isLoading}
                 />
                 <Text>of {pagination.maxPage}</Text>
               </Flex>
             </form>
 
             <Button
-              disabled={currentPage >= pagination.maxPage}
+              disabled={isLoading || currentPage >= pagination.maxPage}
               onClick={() => handlePageChange(currentPage + 1)}
             >
               Next
