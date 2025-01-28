@@ -8,6 +8,7 @@ import authRoutes from "./routes/authRoutes.ts";
 import lendingRoutes from "./routes/lendingRoutes.ts";
 import memberRoutes from "./routes/memberRoutes.ts";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import dashboardRoutes from "./routes/dashboardRoutes.ts";
 
 // init fastify
 dotenv.config();
@@ -53,6 +54,7 @@ fastify.register(authRoutes, { prefix: "/auth" });
 fastify.register(bookRoutes, { prefix: "/book" });
 fastify.register(lendingRoutes, { prefix: "/lending" });
 fastify.register(memberRoutes, { prefix: "/member" });
+fastify.register(dashboardRoutes, { prefix: "/dashboard" });
 
 // start the server
 const start = async () => {

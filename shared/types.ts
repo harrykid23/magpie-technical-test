@@ -213,3 +213,31 @@ export type TypeResponseSearchMemberList = {
   id: string;
   phone: string | null;
 }[];
+
+// DASHBOARD
+export type TypeRequestDashboardLendingPerMonth = {
+  year: string;
+};
+
+export type TypeResponseDashboardLendingPerMonth = {
+  yearMonth: string;
+  count: number;
+}[];
+
+export type TypeRequestDashboardMostPopularBook = {
+  year: string;
+};
+
+export type TypeResponseDashboardMostPopularBook = {
+  title: string;
+  count: number;
+}[];
+
+export type TypeRequestDashboardMostPopularCategory = {
+  year: string;
+};
+
+export type TypeResponseDashboardMostPopularCategory = {
+  title: string;
+  count: number;
+}[];
