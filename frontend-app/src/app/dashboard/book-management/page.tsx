@@ -86,6 +86,7 @@ export default function Dashboard() {
                   setSelectedBookData(row);
                   setIsModalEditBookOpen(true);
                 }}
+                title="Edit Book"
               >
                 <Pencil1Icon color="white" />
               </Button>
@@ -98,6 +99,7 @@ export default function Dashboard() {
                   setSelectedBookData(row);
                   setIsModalDeleteBookOpen(true);
                 }}
+                title="Delete Book"
               >
                 <TrashIcon color="white" />
               </Button>

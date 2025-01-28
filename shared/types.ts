@@ -117,7 +117,7 @@ export type TypeResponseGetCategoryList = {
 // LENDING MANAGEMENT
 export type TypeResponseGetLendingList = {
   id: string;
-  createdAt: Date;
+  createdAt: Date | string;
   createdBy: {
     name: string;
   };
@@ -132,8 +132,8 @@ export type TypeResponseGetLendingList = {
     author: string;
     isbn: string;
   };
-  dueDate: Date;
-  returnDate: Date | null;
+  dueDate: Date | string;
+  returnDate: Date | string | null;
 }[];
 
 export type TypeRequestCreateLending = {
@@ -144,7 +144,7 @@ export type TypeRequestCreateLending = {
 
 export type TypeResponseCreateLending = {
   id: string;
-  createdAt: Date;
+  createdAt: Date | string;
   createdBy: {
     name: string;
   };
@@ -159,13 +159,13 @@ export type TypeResponseCreateLending = {
     author: string;
     isbn: string;
   };
-  dueDate: Date;
-  returnDate: Date | null;
+  dueDate: Date | string;
+  returnDate: Date | string | null;
 };
 
 export type TypeResponseReturnLending = {
   id: string;
-  createdAt: Date;
+  createdAt: Date | string;
   createdBy: {
     name: string;
   };
@@ -180,8 +180,8 @@ export type TypeResponseReturnLending = {
     author: string;
     isbn: string;
   };
-  dueDate: Date;
-  returnDate: Date | null;
+  dueDate: Date | string;
+  returnDate: Date | string | null;
 };
 
 export type TypeRequestGetMemberList = {
