@@ -5,8 +5,8 @@ import authMiddleware from "../middlewares/authMiddleware.ts";
 import generatePermissionMiddleware from "../middlewares/permissionMiddleware.ts";
 import { PERMISSION_NAME } from "../../shared/constants.ts";
 import type {
-  TypeRequestGetMemberList,
-  TypeResponseGetMemberList,
+  TypeRequestSearchMemberList,
+  TypeResponseSearchMemberList,
 } from "../../shared/types.ts";
 import type { Prisma } from "@prisma/client";
 
@@ -19,7 +19,7 @@ export default async function (fastify: FastifyInstance) {
       authMiddleware,
       generatePermissionMiddleware([PERMISSION_NAME.create_book])
     )(async (request, reply) => {
-      const queryRequest = request.query as TypeRequestGetMemberList;
+      const queryRequest = request.query as TypeRequestSearchMemberList;
 
       const whereClause: Prisma.MemberWhereInput = {
         OR: [
@@ -38,7 +38,7 @@ export default async function (fastify: FastifyInstance) {
         ],
       };
 
-      const members: TypeResponseGetMemberList =
+      const members: TypeResponseSearchMemberList =
         await request.trx.member.findMany({
           select: {
             id: true,
@@ -51,7 +51,7 @@ export default async function (fastify: FastifyInstance) {
           orderBy: { name: "asc" },
         });
 
-      const res: TypeAPIBody<TypeResponseGetMemberList> = {
+      const res: TypeAPIBody<TypeResponseSearchMemberList> = {
         statusCode: 200,
         data: members,
       };

@@ -105,11 +105,11 @@ export type TypeResponseUpdateBook = {
   };
 };
 
-export type TypeRequestGetCategoryList = {
+export type TypeRequestSearchCategoryList = {
   search: string;
 };
 
-export type TypeResponseGetCategoryList = {
+export type TypeResponseSearchCategoryList = {
   id: string;
   name: string;
 }[];
@@ -184,11 +184,11 @@ export type TypeResponseReturnLending = {
   returnDate: Date | string | null;
 };
 
-export type TypeRequestGetMemberList = {
+export type TypeRequestSearchMemberList = {
   search: string;
 };
 
-export type TypeResponseGetMemberList = {
+export type TypeResponseSearchMemberList = {
   email: string;
   name: string;
   id: string;

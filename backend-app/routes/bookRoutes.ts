@@ -8,12 +8,12 @@ import dbMiddleware from "../middlewares/dbMiddleware.ts";
 import type { FastifyInstance } from "fastify";
 import type {
   TypeRequestCreateBook,
-  TypeRequestGetCategoryList,
+  TypeRequestSearchCategoryList,
   TypeRequestGetTable,
   TypeRequestUpdateBook,
   TypeResponseCreateBook,
   TypeResponseGetBookList,
-  TypeResponseGetCategoryList,
+  TypeResponseSearchCategoryList,
   TypeResponseUpdateBook,
 } from "../../shared/types.ts";
 import type { Prisma } from "@prisma/client";
@@ -274,7 +274,7 @@ export default async function (fastify: FastifyInstance) {
       authMiddleware,
       generatePermissionMiddleware([PERMISSION_NAME.create_book])
     )(async (request, reply) => {
-      const queryRequest = request.query as TypeRequestGetCategoryList;
+      const queryRequest = request.query as TypeRequestSearchCategoryList;
 
       const whereClause: Prisma.CategoryWhereInput = {
         name: {
@@ -283,7 +283,7 @@ export default async function (fastify: FastifyInstance) {
         },
       };
 
-      const categories: TypeResponseGetCategoryList =
+      const categories: TypeResponseSearchCategoryList =
         await request.trx.category.findMany({
           select: {
             id: true,
@@ -294,7 +294,7 @@ export default async function (fastify: FastifyInstance) {
           orderBy: { name: "asc" },
         });
 
-      const res: TypeAPIBody<TypeResponseGetCategoryList> = {
+      const res: TypeAPIBody<TypeResponseSearchCategoryList> = {
         statusCode: 200,
         data: categories,
       };

@@ -6,10 +6,10 @@ import { useToast } from "../general/customToast.tsx";
 import buildApiCaller from "@/hook/apiHook.ts";
 import { TypeAPIBody } from "../../../../backend-app/utils/apiUtils.ts";
 import {
-  TypeRequestGetCategoryList,
+  TypeRequestSearchCategoryList,
   TypeRequestUpdateBook,
   TypeResponseGetBookList,
-  TypeResponseGetCategoryList,
+  TypeResponseSearchCategoryList,
 } from "@shared/types.ts";
 import SelectWithSearch from "../general/selectWithSearch.tsx";
 import { Dispatch, SetStateAction, useEffect } from "react";
@@ -79,10 +79,11 @@ export default function EditBookModal({
     });
   };
 
-  const { result: categoryList, fetchData: getCategoryList } = buildApiCaller<
-    TypeRequestGetCategoryList,
-    TypeAPIBody<TypeResponseGetCategoryList>
-  >("/book/category");
+  const { result: categoryList, fetchData: searchCategoryList } =
+    buildApiCaller<
+      TypeRequestSearchCategoryList,
+      TypeAPIBody<TypeResponseSearchCategoryList>
+    >("/book/category");
 
   // set default data
   useEffect(() => {
@@ -186,7 +187,7 @@ export default function EditBookModal({
             <Flex direction="column" gap="1">
               <SelectWithSearch
                 fetchData={async (searchQuery) => {
-                  getCategoryList({
+                  searchCategoryList({
                     queryParams: {
                       search: searchQuery,
                     },

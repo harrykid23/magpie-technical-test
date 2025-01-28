@@ -8,8 +8,8 @@ import buildApiCaller from "@/hook/apiHook.ts";
 import { TypeAPIBody } from "../../../../backend-app/utils/apiUtils.ts";
 import {
   TypeRequestCreateBook,
-  TypeRequestGetCategoryList,
-  TypeResponseGetCategoryList,
+  TypeRequestSearchCategoryList,
+  TypeResponseSearchCategoryList,
 } from "@shared/types.ts";
 import SelectWithSearch from "../general/selectWithSearch.tsx";
 import { useState } from "react";
@@ -72,10 +72,11 @@ export default function AddBookButton({ refreshTable }: AddBookButtonProps) {
     });
   };
 
-  const { result: categoryList, fetchData: getCategoryList } = buildApiCaller<
-    TypeRequestGetCategoryList,
-    TypeAPIBody<TypeResponseGetCategoryList>
-  >("/book/category");
+  const { result: categoryList, fetchData: searchCategoryList } =
+    buildApiCaller<
+      TypeRequestSearchCategoryList,
+      TypeAPIBody<TypeResponseSearchCategoryList>
+    >("/book/category");
 
   return (
     <Dialog.Root open={isModalOpen}>
@@ -159,7 +160,7 @@ export default function AddBookButton({ refreshTable }: AddBookButtonProps) {
             <Flex direction="column" gap="1">
               <SelectWithSearch
                 fetchData={async (searchQuery) => {
-                  getCategoryList({
+                  searchCategoryList({
                     queryParams: {
                       search: searchQuery,
                     },
