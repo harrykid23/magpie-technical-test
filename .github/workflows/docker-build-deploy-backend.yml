@@ -69,7 +69,7 @@ jobs:
             local docker_compose_file=$1
             local image_name=$2
 
-            docker-compose -f $docker_compose_file up --build
+            docker-compose -f $docker_compose_file build
             docker tag $image_name:latest $image_name:$DOCKER_TAG
             docker push $image_name:latest
             docker push $image_name:$DOCKER_TAG
