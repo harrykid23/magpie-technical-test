@@ -56,6 +56,8 @@ fastify.register(lendingRoutes, { prefix: "/lending" });
 fastify.register(memberRoutes, { prefix: "/member" });
 fastify.register(dashboardRoutes, { prefix: "/dashboard" });
 
+export default fastify;
+
 // start the server
 const start = async () => {
   const PORT = parseInt(process.env.PORT as string) || 3000;
