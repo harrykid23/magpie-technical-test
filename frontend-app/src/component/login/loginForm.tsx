@@ -103,6 +103,7 @@ export default function LoginForm() {
               size="1"
               onClick={togglePasswordVisibility}
               style={{ cursor: "pointer" }}
+              type="button"
             >
               {showPassword ? <EyeOpenIcon /> : <EyeClosedIcon />}
             </Button>
